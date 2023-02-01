@@ -4,6 +4,7 @@ import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
+  GithubAuthProvider,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth'
@@ -21,7 +22,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
-const provider = new GoogleAuthProvider()
+const googleProvider = new GoogleAuthProvider()
+const githubProvider = new GithubAuthProvider()
+
+const providers = {
+  google: googleProvider,
+  github:githubProvider
+}
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -40,8 +47,8 @@ export default function App() {
     }
   }, [])
 
-  const handleGoogleLogin = async () => {
-    const { user } = await signInWithPopup(auth, provider)
+  const handleLogin = async (provider) => {
+    const { user } = await signInWithPopup(auth, providers[provider])
     setUser(user)
   }
 
@@ -53,7 +60,10 @@ export default function App() {
           <button onClick={() => signOut(auth)}>Signout</button>
         </>
       ) : (
-        <button onClick={handleGoogleLogin}>Login</button>
+        <>
+          <button onClick={() => handleLogin('google')}>Login Google</button>
+          <button onClick={() => handleLogin('github')}>Login Github</button>
+        </>
       )}
     </div>
   )
