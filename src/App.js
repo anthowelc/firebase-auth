@@ -30,6 +30,17 @@ const providers = {
   github:githubProvider
 }
 
+const UserPage = () => {
+  const user = auth.currentUser
+
+  return (
+    <div>
+      <h1>{user.displayName}</h1>
+      <p>{user.email}</p>
+    </div>
+  )
+}
+
 export default function App() {
   const [user, setUser] = useState(null)
 
@@ -58,6 +69,8 @@ export default function App() {
         <>
           <h1>{user?.displayName}</h1>
           <button onClick={() => signOut(auth)}>Signout</button>
+          <hr />
+          <UserPage/>
         </>
       ) : (
         <>
