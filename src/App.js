@@ -47,6 +47,10 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        const displayName = user.displayName
+        const email = user.email
+        const photoURL = user.photoURL
+        const emailVerified = user.emailVerified
         setUser(user)
       } else {
         setUser(null)
