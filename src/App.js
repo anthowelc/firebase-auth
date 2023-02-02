@@ -6,7 +6,10 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  updateProfile,
+  updateEmail,
+  deleteUser
 } from 'firebase/auth'
 import { useState, useEffect } from 'react'
 
@@ -27,7 +30,7 @@ const githubProvider = new GithubAuthProvider()
 
 const providers = {
   google: googleProvider,
-  github:githubProvider
+  github: githubProvider
 }
 
 const UserPage = () => {
@@ -45,7 +48,7 @@ export default function App() {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
       if (user) {
         const displayName = user.displayName
         const email = user.email
@@ -62,19 +65,64 @@ export default function App() {
     }
   }, [])
 
-  const handleLogin = async (provider) => {
+  const handleLogin = async provider => {
     const { user } = await signInWithPopup(auth, providers[provider])
     setUser(user)
   }
 
+  const handleChangeName = async () => {
+    const num = Math.floor(Math.random() * 25)
+    const newInfo = {
+      displayName: num,
+      photoURL: `https://randomuser.me/api/portraits/men/${num}.jpg`
+    }
+    try {
+      await updateProfile(auth.currentUser, newInfo)
+    } catch (error) {
+      console.log(error)
+    }
+
+    setUser({
+      ...user,
+      ...newInfo
+    })
+  }
+
+  const handleChangeEmail = async () => {
+    const num = Math.floor(Math.random() * 1000)
+    const email = `${num}@gmail.com`
+    try {
+      await updateEmail(auth.currentUser, email)
+    } catch (error) {
+      console.log(error)
+    }
+
+    setUser({
+      ...user,
+      email
+    })
+  }
+
+  const removeUser = async () => {
+    await deleteUser(auth.currentUser)
+  }
+
   return (
-    <div className="App">
+    <div className='App'>
       {user ? (
         <>
           <h1>{user?.displayName}</h1>
+          <p>
+            {' '}
+            <img src={user.photoURL} alt='' />
+          </p>
+          <p>{user.email}</p>
+          <button onClick={() => handleChangeName(user)}>Change Name</button>
+          <button onClick={() => handleChangeEmail(user)}>Change Email</button>
           <button onClick={() => signOut(auth)}>Signout</button>
+          <button onClick={() => removeUser(user)}>delete</button>
           <hr />
-          <UserPage/>
+          <UserPage />
         </>
       ) : (
         <>
